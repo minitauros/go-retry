@@ -8,9 +8,10 @@ The retry package provides functions for retrying any type of action a given num
 err := Retry(3, func() error {
     err := someFunc()
     if err != nil {
-    	// Retry.
-    	// If 4th attempt (max number of attempts exceeded), 
-    	// this error is returned.
+        time.Sleep(time.Second) // Wait a bit before retrying.
+        // Retry.
+        // If 4th attempt (max number of attempts exceeded),
+        // this error is returned.
         return err
     }
     return nil // Stop retrying.
@@ -22,17 +23,18 @@ err := Retry(3, func() error {
 ```go
 ctx, cancel := context.WithCancel(context.Background())
 
-// Cancel the context. 
-// The function will never be called and 
-// the context error will be returned right away.
+// If the context has an error, the function will
+// never be called and the context error will be
+// returned right away.
 cancel() 
 
 err := RetryCtx(ctx, 3, func() error {
     err := someFunc()
     if err != nil {
-    	// Retry.
-    	// If 4th attempt (max number of attempts exceeded), 
-    	// this error is returned.
+        time.Sleep(time.Second) // Wait a bit before retrying.
+        // Retry.
+        // If 4th attempt (max number of attempts exceeded),
+        // this error is returned.
         return err
     }
     return nil // Stop retrying.
@@ -41,7 +43,11 @@ err := RetryCtx(ctx, 3, func() error {
 
 ### RetryWithStop()
 
-If you want to have fine grained control over when the retrying should stop.
+If you want to have fine grained control over when the retrying should stop (e.g. if a certain type of error is encountered).
+
+Returning `nil` or `err` does not stop retrying. It only stops when `stop()` is called.
+
+If `stop()` is called and then an `err` is returned, that is the error that will be returned from the `RetryWithStop` function.
 
 ```go
 err := RetryWithStop(3, func(stop func()) error {
@@ -52,10 +58,12 @@ err := RetryWithStop(3, func(stop func()) error {
             return err // Return this error.
         }
 
+        time.Sleep(time.Second) // Wait a bit before retrying.
         return err // Retry.
+        return nil // This would have the same effect (also retry).
     }
     stop() // No err was returned. We can stop retrying.
-    return nil // Retry.
+    return nil
 })
 ```
 
@@ -64,9 +72,9 @@ err := RetryWithStop(3, func(stop func()) error {
 ```go
 ctx, cancel := context.WithCancel(context.Background())
 
-// Cancel the context. 
-// The function will never be called and 
-// the context error will be returned right away.
+// If the context has an error, the function will
+// never be called and the context error will be
+// returned right away.
 cancel()
     
 err := RetryWithStopCtx(ctx, 3, func(stop func()) error {
@@ -77,10 +85,12 @@ err := RetryWithStopCtx(ctx, 3, func(stop func()) error {
             return err // Return this error.
         }
 
+        time.Sleep(time.Second) // Wait a bit before retrying.
         return err // Retry.
+		return nil // This would have the same effect (also retry).
     }
     stop() // No err was returned. We can stop retrying.
-    return nil // Retry.
+    return nil
 })
 ```
 
@@ -100,8 +110,8 @@ err := retrier.Retry(3, func() error {
         // Second attempt will sleep for time.Second * 2.
         // Third attempt will sleep for time.Second * 2 * 2.
         // Etc.
-        // If 4th attempt (max number of attempts exceeded), 
-    	// this error is returned.
+        // If 4th attempt (max number of attempts exceeded),
+        // this error is returned.
         return err
     }
     return nil // Stop retrying.
