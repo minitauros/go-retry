@@ -23,7 +23,7 @@ err := Retry(3, func() error {
 ```go
 ctx, cancel := context.WithCancel(context.Background())
 
-// If the context has an error, the function will
+// If the context has an error, the callback function will
 // never be called and the context error will be
 // returned right away.
 cancel() 
@@ -72,7 +72,7 @@ err := RetryWithStop(3, func(stop func()) error {
 ```go
 ctx, cancel := context.WithCancel(context.Background())
 
-// If the context has an error, the function will
+// If the context has an error, the callback function will
 // never be called and the context error will be
 // returned right away.
 cancel()
@@ -101,15 +101,15 @@ Works the same as the regular retry functions, but sleeps before making a new at
 Example with the regular `Retry()` function:
 
 ```go
+// First attempt will sleep for time.Second.
+// Second attempt will sleep for time.Second * 2.
+// Third attempt will sleep for time.Second * 2 * 2.
+// Etc.
 retrier := NewBackOffRetrier(time.Second, 2)
 err := retrier.Retry(3, func() error {
     err := someFunc()
     if err != nil {
         // Retry.
-        // First attempt will sleep for time.Second.
-        // Second attempt will sleep for time.Second * 2.
-        // Third attempt will sleep for time.Second * 2 * 2.
-        // Etc.
         // If 4th attempt (max number of attempts exceeded),
         // this error is returned.
         return err
