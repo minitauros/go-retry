@@ -40,6 +40,43 @@ err := RetryCtx(ctx, 3, func() error {
     return nil // Stop retrying.
 })
 ```
+### RetryWithDelay()
+
+```go
+err := RetryWithDelay(3, time.Second, func() error {
+    err := someFunc()
+    if err != nil {
+        // We will sleep for 1 second and then retry.
+        // If 4th attempt (max number of attempts exceeded),
+        // this error is returned.
+        return err
+    }
+    return nil // Stop retrying.
+})
+```
+
+### RetryWithDelayCtx()
+
+```go
+ctx, cancel := context.WithCancel(context.Background())
+
+// If the context has an error, the callback function will
+// never be called and the context error will be
+// returned right away.
+cancel() 
+
+err := RetryWithDelayCtx(ctx, 3, time.Second, func() error {
+    err := someFunc()
+    if err != nil {
+        time.Sleep(time.Second) // Wait a bit before retrying.
+        // We will sleep for 1 second and then retry.
+        // If 4th attempt (max number of attempts exceeded),
+        // this error is returned.
+        return err
+    }
+    return nil // Stop retrying.
+})
+```
 
 ### RetryWithStop()
 
@@ -87,7 +124,7 @@ err := RetryWithStopCtx(ctx, 3, func(stop func()) error {
 
         time.Sleep(time.Second) // Wait a bit before retrying.
         return err // Retry.
-		return nil // This would have the same effect (also retry).
+        return nil // This would have the same effect (also retry).
     }
     stop() // No err was returned. We can stop retrying.
     return nil
@@ -96,7 +133,7 @@ err := RetryWithStopCtx(ctx, 3, func(stop func()) error {
 
 ## Retry with backoff
 
-Works the same as the regular retry functions, but sleeps before making a new attempt.
+Works the same as the regular retry functions, but sleeps according to specified backoff before making a new attempt.
 
 Example with the regular `Retry()` function:
 
