@@ -36,7 +36,12 @@ func (r *BackOffRetrier) Retry(numTimes int, cb func() error) error {
 		}
 		err := cb()
 		if err != nil {
-			sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			if sleepDur == 0 {
+				// First attempt. Don't multiply yet.
+				sleepDur = delay
+			} else {
+				sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			}
 		}
 		return err
 	})
@@ -57,7 +62,12 @@ func (r *BackOffRetrier) RetryCtx(ctx context.Context, numTimes int, cb func() e
 		}
 		err = cb()
 		if err != nil {
-			sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			if sleepDur == 0 {
+				// First attempt. Don't multiply yet.
+				sleepDur = delay
+			} else {
+				sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			}
 		}
 		return err
 	})
@@ -74,7 +84,12 @@ func (r *BackOffRetrier) RetryWithStop(numTimes int, cb func(stop func()) error)
 		}
 		err := cb(stop)
 		if err != nil {
-			sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			if sleepDur == 0 {
+				// First attempt. Don't multiply yet.
+				sleepDur = delay
+			} else {
+				sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			}
 		}
 		return err
 	})
@@ -96,7 +111,12 @@ func (r *BackOffRetrier) RetryWithStopCtx(ctx context.Context, numTimes int, cb 
 		}
 		err = cb(stop)
 		if err != nil {
-			sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			if sleepDur == 0 {
+				// First attempt. Don't multiply yet.
+				sleepDur = delay
+			} else {
+				sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			}
 		}
 		return err
 	})
