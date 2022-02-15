@@ -28,12 +28,15 @@ func NewBackOffRetrier(initialDelay time.Duration, backOffCoefficient float64) *
 // Retry retries the given callback at max the given number of times.
 // It stops as soon as a `nil` error is returned.
 func (r *BackOffRetrier) Retry(numTimes int, cb func() error) error {
+	var sleepDur time.Duration
 	delay := r.initialDelay
 	return Retry(numTimes, func() error {
+		if sleepDur > 0 {
+			time.Sleep(sleepDur)
+		}
 		err := cb()
 		if err != nil {
-			time.Sleep(delay)
-			delay = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
 		}
 		return err
 	})
@@ -42,17 +45,19 @@ func (r *BackOffRetrier) Retry(numTimes int, cb func() error) error {
 // RetryCtx retries the given callback at max the given number of times.
 // It stops as soon as a `nil` error is returned.
 func (r *BackOffRetrier) RetryCtx(ctx context.Context, numTimes int, cb func() error) error {
+	var sleepDur time.Duration
 	delay := r.initialDelay
 	return Retry(numTimes, func() error {
 		err := ctx.Err()
 		if err != nil {
 			return err
 		}
-
+		if sleepDur > 0 {
+			time.Sleep(sleepDur)
+		}
 		err = cb()
 		if err != nil {
-			time.Sleep(delay)
-			delay = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
 		}
 		return err
 	})
@@ -61,12 +66,15 @@ func (r *BackOffRetrier) RetryCtx(ctx context.Context, numTimes int, cb func() e
 // RetryWithStop retries the given callback at max the given number of times.
 // It stops only when `stop` is called.
 func (r *BackOffRetrier) RetryWithStop(numTimes int, cb func(stop func()) error) error {
+	var sleepDur time.Duration
 	delay := r.initialDelay
 	return RetryWithStop(numTimes, func(stop func()) error {
+		if sleepDur > 0 {
+			time.Sleep(sleepDur)
+		}
 		err := cb(stop)
 		if err != nil {
-			time.Sleep(delay)
-			delay = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
 		}
 		return err
 	})
@@ -75,6 +83,7 @@ func (r *BackOffRetrier) RetryWithStop(numTimes int, cb func(stop func()) error)
 // RetryWithStopCtx retries the given callback at max the given number of times.
 // It stops only when `stop` is called.
 func (r *BackOffRetrier) RetryWithStopCtx(ctx context.Context, numTimes int, cb func(stop func()) error) error {
+	var sleepDur time.Duration
 	delay := r.initialDelay
 	return RetryWithStop(numTimes, func(stop func()) error {
 		err := ctx.Err()
@@ -82,11 +91,12 @@ func (r *BackOffRetrier) RetryWithStopCtx(ctx context.Context, numTimes int, cb 
 			stop()
 			return err
 		}
-
+		if sleepDur > 0 {
+			time.Sleep(sleepDur)
+		}
 		err = cb(stop)
 		if err != nil {
-			time.Sleep(delay)
-			delay = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
+			sleepDur = time.Duration(math.Round(r.backOffCoefficient * float64(delay)))
 		}
 		return err
 	})
