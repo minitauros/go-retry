@@ -68,7 +68,6 @@ cancel()
 err := RetryWithDelayCtx(ctx, 3, time.Second, func() error {
     err := someFunc()
     if err != nil {
-        time.Sleep(time.Second) // Wait a bit before retrying.
         // We will sleep for 1 second and then retry.
         // If 4th attempt (max number of attempts exceeded),
         // this error is returned.
