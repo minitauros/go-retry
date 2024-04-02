@@ -222,8 +222,7 @@ func Test_BackoffRetrier_RetryWithStop(t *testing.T) {
 				So(numCalled, ShouldEqual, 2)
 
 				timeElapsed := time.Now().Sub(startTime)
-				expectedMinTimeElapsed := expectedTimeBackedOff(retrier.initialDelay, retrier.backOffCoefficient, numCalled-1) // -1 because if called 3 times then there must have been 2 sleeps.
-				So(timeElapsed, ShouldBeGreaterThanOrEqualTo, expectedMinTimeElapsed)
+				So(timeElapsed, ShouldBeLessThan, retrier.initialDelay) // Returning nil does not trigger sleep.
 			})
 		})
 
@@ -320,8 +319,7 @@ func Test_BackoffRetrier_RetryWithStopCtx(t *testing.T) {
 				So(numCalled, ShouldEqual, 2)
 
 				timeElapsed := time.Now().Sub(startTime)
-				expectedMinTimeElapsed := expectedTimeBackedOff(retrier.initialDelay, retrier.backOffCoefficient, numCalled-1) // -1 because if called 3 times then there must have been 2 sleeps.
-				So(timeElapsed, ShouldBeGreaterThanOrEqualTo, expectedMinTimeElapsed)
+				So(timeElapsed, ShouldBeLessThan, retrier.initialDelay) // Returning nil does not trigger sleep.
 			})
 		})
 
