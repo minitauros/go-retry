@@ -1,6 +1,6 @@
 module github.com/minitauros/go-retry
 
-go 1.22.1
+go 1.23.3
 
 require github.com/smartystreets/goconvey v1.8.1
 
