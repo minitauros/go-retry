@@ -1,4 +1,23 @@
+# Retry
+
 The retry package provides functions for retrying any type of action a given number of times.
+
+## Usage
+
+```
+go get github.com/minitauros/go-retry
+```
+
+For the rest, see the examples below.
+
+* [Regular retry functions](#regular-retry-functions)
+  * [Retry()](#retry)
+  * [RetryCtx()](#retryctx)
+  * [RetryWithDelay()](#retrywithdelay)
+  * [RetryWithDelayCtx()](#retrywithdelayctx)
+  * [RetryWithStop()](#retrywithstop)
+  * [RetryWithStopCtx()](#retrywithstopctx)
+* [Retry with backoff](#retry-with-backoff)
 
 ## Regular retry functions
 
